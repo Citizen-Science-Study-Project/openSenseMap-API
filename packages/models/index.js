@@ -12,8 +12,8 @@ config.util.setModuleDefaults('openSenseMap-API-models', {
     'port': 27017,
     'user': 'admin',
     'userpass': 'admin',
-    'authsource': 'OSeM-api',
-    'db': 'OSeM-api',
+    'authsource': 'admin',
+    'db': '',
     'mongo_uri': ''
   },
   'integrations': {
