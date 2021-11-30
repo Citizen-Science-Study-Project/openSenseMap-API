@@ -13,4 +13,4 @@ volumes:
   mongo-data:
 networks:
   api-db-network:
-    external: true
+    external: false
