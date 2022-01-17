@@ -6,7 +6,7 @@ const usersController = require('./usersController'),
   sensorsController = require('./sensorsController'),
   measurementsController = require('./measurementsController'),
   managementController = require('./managementController'),
-  visualizationsController = require('./visualizationsController');
+  visController = require('./visController');
 
 module.exports = {
   usersController,
@@ -15,5 +15,5 @@ module.exports = {
   sensorsController,
   measurementsController,
   managementController,
-  visualizationsController
+  visController
 };

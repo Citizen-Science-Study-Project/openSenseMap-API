@@ -557,6 +557,40 @@ userSchema.methods.mail = function mail (template, data) {
   return mails.sendMail(template, this, data);
 };
 
+userSchema.methods.checkVisOwner = function checkVisOwner (visId) {
+  const user = this;
+
+  // first check if the box belongs to this user
+  if (!user.vis) {
+    throw new ModelError('User does not own this senseBox', { type: 'ForbiddenError' });
+  }
+
+  const userOwnsVis = user.vis.some(b => b.equals(visId));
+
+  if (userOwnsVis === false) {
+    throw new ModelError('User does not own this senseBox', { type: 'ForbiddenError' });
+  }
+
+  return true;
+};
+
+userSchema.methods.addVis = function addVis (params) {
+  const user = this;
+
+  // initialize new vis
+  return Vis.initNew(params)
+    .then(function (savedVis) {
+      // request is valid
+      // persist the saved box in the user
+      user.vis.addToSet(savedVis._id);
+
+      return user.save()
+        .then(function () {
+          return savedVis.toJSON();
+        });
+    });
+};
+
 const handleE11000 = function (error, res, next) {
   if (error.name === 'MongoError' && error.code === 11000) {
     return next(new ModelError('Duplicate user detected'));

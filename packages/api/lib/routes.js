@@ -6,7 +6,7 @@ const { usersController,
     sensorsController,
     measurementsController,
     managementController,
-    visualizationsController } = require('./controllers'),
+    visController } = require('./controllers'),
   config = require('config'),
   { getVersion } = require('./helpers/apiUtils'),
   { verifyJwt } = require('./helpers/jwtHelpers'),
@@ -68,7 +68,7 @@ const printRoutes = function printRoutes (req, res) {
   res.end(lines.join('\n'));
 };
 
-const { boxes: boxesPath, users: usersPath, statistics: statisticsPath, management: managementPath, visualizations: visualizationsPath } = config.get('routes');
+const { boxes: boxesPath, users: usersPath, statistics: statisticsPath, management: managementPath, vis: visPath } = config.get('routes');
 // the ones matching first are used
 // case is ignored
 const routes = {
@@ -93,9 +93,10 @@ const routes = {
     { path: `${usersPath}/confirm-email`, method: 'post', handler: usersController.confirmEmailAddress, reference: 'api-Users-confirm-email' },
     { path: `${usersPath}/sign-in`, method: 'post', handler: usersController.signIn, reference: 'api-Users-sign-in' },
     { path: `${usersPath}/refresh-auth`, method: 'post', handler: usersController.refreshJWT, reference: 'api-Users-refresh-auth' },
-    { path: `${visualizationsPath}/webmap`, method: 'get', handler: visualizationsController.getWebMap, reference: 'api-Visualizations-webmap' },
+    { path: `${visPath}/test`, method: 'post', handler: visController.testVis, reference: 'api-Visualizations-test' },
+    /* { path: `${visualizationsPath}/webmap`, method: 'get', handler: visualizationsController.getWebMap, reference: 'api-Visualizations-webmap' },
     { path: `${visualizationsPath}/pdf`, method: 'get', handler: visualizationsController.getPDF, reference: 'api-Visualizations-pdf' },
-    { path: `${visualizationsPath}/gif`, method: 'get', handler: visualizationsController.getGIF, reference: 'api-Visualizations-gif' }
+    { path: `${visualizationsPath}/gif`, method: 'get', handler: visualizationsController.getGIF, reference: 'api-Visualizations-gif' } */
   ],
   'auth': [
     { path: `${usersPath}/me`, method: 'get', handler: usersController.getUser, reference: 'api-Users-getUser' },
@@ -108,7 +109,11 @@ const routes = {
     { path: `${boxesPath}/:boxId/:sensorId/measurements`, method: 'del', handler: sensorsController.deleteSensorData, reference: 'api-Measurements-deleteMeasurements' },
     { path: `${usersPath}/sign-out`, method: 'post', handler: usersController.signOut, reference: 'api-Users-sign-out' },
     { path: `${usersPath}/me`, method: 'del', handler: usersController.deleteUser, reference: 'api-Users-deleteUser' },
-    { path: `${usersPath}/me/resend-email-confirmation`, method: 'post', handler: usersController.requestEmailConfirmation, reference: 'api-Users-request-email-confirmation' }
+    { path: `${usersPath}/me/resend-email-confirmation`, method: 'post', handler: usersController.requestEmailConfirmation, reference: 'api-Users-request-email-confirmation' },
+    { path: `${visPath}`, method: 'post', handler: visController.postNewVis, reference: 'api-Users-postNewVis' },
+    //{ path: `${visualizationsPath}/:visId`, method: 'put', handler: visualizationsController.updateVis, reference: 'api-Users-updateVis' }, //Error here
+    //{ path: `${visualizationsPath}/:visId`, method: 'del', handler: visualizationsController.deleteVis, reference: 'api-Users-deleteVis' }, //Error here
+    //{ path: `${usersPath}/me/vis`, method: 'get', handler: usersController.getUserVis, reference: 'api-Users-getUserVis' } //Error here
   ],
   'management': [
     { path: `${managementPath}/boxes`, method: 'get', handler: managementController.listBoxes, reference: 'api-Admin-listBoxes' },
