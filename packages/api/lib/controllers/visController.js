@@ -73,8 +73,7 @@ module.exports = {
     ]),
     checkPrivilegeVis,
     deleteVis
-  ],
-  testVis
+  ]
 }
 
 
