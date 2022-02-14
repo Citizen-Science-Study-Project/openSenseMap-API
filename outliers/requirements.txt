@@ -1,0 +1,7 @@
+# Cron job
+flask~=1.1.2
+celery~=4.4.4
+redis
+
+# Connect to mongodb
+pymongo~=3.10.1
