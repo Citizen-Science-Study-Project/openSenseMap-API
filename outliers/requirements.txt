@@ -1,0 +1,12 @@
+# Cron job
+flask~=2.0.2
+celery~=4.4.7
+redis
+
+# Connect to mongodb
+pymongo~=3.12.3
+
+# Cook Distance Analysis
+pandas
+statsmodels
+numpy

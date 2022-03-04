@@ -26,3 +26,6 @@ dev_run_migration.sh
 
 development.json
 userimages*
+
+# PyCharm IDE
+.idea

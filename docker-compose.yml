@@ -9,6 +9,23 @@ services:
     networks:
       - api-db-network
 
+  jobs:
+    build: './outliers/'
+    depends_on:
+      - db
+    links:
+      - db
+      - redis
+    networks:
+      - api-db-network
+
+  redis:
+    image: 'redis:4-alpine'
+    ports:
+      - '6379:6379'
+    networks:
+      - api-db-network
+
 volumes:
   mongo-data:
 networks:
