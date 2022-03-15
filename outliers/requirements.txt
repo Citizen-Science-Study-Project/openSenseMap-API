@@ -10,3 +10,7 @@ pymongo~=3.12.3
 pandas
 statsmodels
 numpy
+
+# Create a Gif
+flask
+pillow
