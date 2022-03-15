@@ -1,6 +1,9 @@
 FROM python:3.8
 WORKDIR /usr/src/app
 
+ENV http_proxy http://wwwproxy.uni-muenster.de:80
+ENV https_proxy http://wwwproxy.uni-muenster.de:80
+
 # install supervisord
 RUN apt-get update && apt-get install -y supervisor
 
