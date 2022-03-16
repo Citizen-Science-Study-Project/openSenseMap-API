@@ -187,6 +187,57 @@ const geoJsonStringifyReplacer = function geoJsonStringifyReplacer (key, box) {
   return box;
 };
 
+const geoJsonStringifyReplacerInit = function geoJsonStringifyReplacerInit (key, box) {
+
+  const newValues = {};
+  if (key === 'sensors') {
+    box.map(sensor => {
+      if (sensor && sensor.lastMeasurement) {
+        newValues[sensor.title] = {
+          value: parseFloat(sensor.lastMeasurement.value),
+          is_outlier: sensor.lastMeasurement.is_outlier
+        };
+      }
+
+      return null;
+    });
+
+    return { live: newValues };
+  }
+
+  if (key === '') {
+    const coordinates = box.currentLocation.coordinates;
+    box.currentLocation = undefined;
+    box.loc = undefined;
+
+    return point(coordinates, box);
+  }
+
+  return box;
+};
+
+const getBoxesInit = async function getBoxesInit (req, res, next) {
+  // content-type is always application/json for this route
+  res.header('Content-Type', 'application/json; charset=utf-8');
+
+  // default format
+  const stringifier = jsonstringify({ open: '{"type":"FeatureCollection","features":[', close: ']}' }, geoJsonStringifyReplacerInit);
+
+  try {
+    let stream = await Box.findBoxesLastMeasurements({ full: true });
+
+    stream
+      .pipe(stringifier)
+      .on('error', function (err) {
+        res.end(`Error: ${err.message}`);
+      })
+      .pipe(res);
+  } catch (err) {
+    handleError(err, next);
+  }
+};
+
+
 /**
  * @api {get} /boxes?date=:date&phenomenon=:phenomenon&format=:format Get all senseBoxes
  * @apiDescription With the optional `date` and `phenomenon` parameters you can find senseBoxes that have submitted data around that time, +/- 4 hours, or specify two dates separated by a comma.
@@ -594,5 +645,8 @@ module.exports = {
     parseAndValidateTimeParamsForFindAllBoxes,
     addCache('5 minutes', 'getBoxes'),
     getBoxes
+  ],
+  getBoxesInit: [
+    getBoxesInit
   ]
 };

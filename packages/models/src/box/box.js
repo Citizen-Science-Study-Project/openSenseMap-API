@@ -152,7 +152,7 @@ const BOX_PROPS_FOR_POPULATION = {
 
 const BOX_SUB_PROPS_FOR_POPULATION = [
   {
-    path: 'sensors.lastMeasurement', select: { value: 1, createdAt: 1, _id: 0 }
+    path: 'sensors.lastMeasurement', select: { value: 1, createdAt: 1, _id: 0, is_outlier: 1 },
   },
 ];
 
@@ -1012,7 +1012,7 @@ boxSchema.statics.findBoxesLastMeasurements = function findBoxesLastMeasurements
   const query = buildFindBoxesQuery(opts);
 
   if (!fromDate && !toDate) {
-    if (full === 'true') {
+    if (full === true || full === 'true') {
       return Promise.resolve(schema.find(query, BOX_PROPS_FOR_POPULATION)
         .populate(BOX_SUB_PROPS_FOR_POPULATION)
         .cursor({ lean: true })

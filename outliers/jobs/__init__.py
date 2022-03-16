@@ -29,7 +29,7 @@ app.config['CELERY_BROKER_URL'] = "redis://redis:6379/0"
 app.config['CELERYBEAT_SCHEDULE'] = {
     'calculate-outliers': {
         'task': 'update_outliers',
-        'schedule': timedelta(seconds=10)
+        'schedule': timedelta(seconds=60)
     },
 }
 

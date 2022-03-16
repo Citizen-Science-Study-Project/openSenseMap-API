@@ -7,29 +7,39 @@ from pymongo import MongoClient
 
 def job_update_outliers():
     URI = 'mongodb://db:27017'
-    phenomenon = 'Temperatur'
     with MongoClient(URI) as connection:
         db = connection['OSeM-api']
-        df_measurements = get_df_measurements(db, phenomenon)
-        model = regression_model(df_measurements)
-        cd = cook_distance(model)
-        ids = []
-        count = 0
-        for element in cd:
-            if (element > 4 / len(df_measurements.index)):  # Using cook's distance formula
-                ids.append(count)
-            count += 1
-        # Return influential temperature values
-        influential_temp_values = df_measurements[df_measurements.index.isin(ids)]
-        print(influential_temp_values['_id'], influential_temp_values['sensor_id'], influential_temp_values['value'])
-        sensors = (influential_temp_values['_id']).to_list()
-        update_outliers(db, sensors)
+
+        # phenomena = ['rel. Luftfeuchte']
+        phenomena = ['PM10', 'PM2.5', 'Temperatur', 'rel. Luftfeuchte', 'Luftfeuchtigkeit', 'Luftfeuchte']
+        for phenomenon in phenomena:
+            df_measurements = get_df_measurements(db, phenomenon)
+
+            if df_measurements.empty:
+                return
+
+            model = regression_model(df_measurements)
+            cd = cook_distance(model)
+            ids = []
+            count = 0
+            for element in cd:
+                if (element > 4 / len(df_measurements.index)):  # Using cook's distance formula
+                    ids.append(count)
+                count += 1
+            # Return influential temperature values
+            influential_temp_values = df_measurements[df_measurements.index.isin(ids)]
+            print(influential_temp_values['_id'], influential_temp_values['sensor_id'], influential_temp_values['value'])
+            sensors = (influential_temp_values['_id']).to_list()
+            update_outliers(db, sensors)
 
 
 def update_outliers(db, sensors):
-    measurements_query = {'_id': {'$in': sensors}}
+    # measurements_query = {'_id': {'$in': sensors}}
     new_values = {"$set": {"is_outlier": True}}
-    db.measurements.update(measurements_query, new_values)
+    # db.measurements.update({'_id': {'$in': [sensors[1]]}}, new_values)
+    for sensor in sensors:
+        measurements_query = {'_id': sensor}
+        db.measurements.update(measurements_query, new_values)
     print('Update outliers')
 
 
@@ -47,24 +57,25 @@ def get_df_measurements(db, phenomenon):
             if sensor['title'] == phenomenon:
                 sensors.append(sensor['_id'])
 
-    from_date = datetime(2019, 7, 31, 10, 8, 30, 125000)
+    from_date = datetime(2019, 7, 28, 10, 8, 30, 125000)
     to_date = datetime(2019, 7, 31, 10, 9, 30, 125000)
 
     measure_query = {
         'sensor_id': {'$in': sensors},
-        'createdAt': {'$gt': from_date, '$lt': to_date}
+        # 'createdAt': {'$gt': from_date, '$lt': to_date}
     }
 
     db_measurements = db.measurements.find(measure_query)
     measurements = []
     for measurement in db_measurements:
-        measurements.append({
-            '_id': measurement['_id'],
-            'sensor_id': measurement['sensor_id'],
-            'value': float(measurement['value']),
-            'location': measurement['location'],
-            'createdAt': int(measurement["createdAt"].strftime('%Y%m%d'))
-        })
+        if measurement['value']:
+            measurements.append({
+                '_id': measurement['_id'],
+                'sensor_id': measurement['sensor_id'],
+                'value': float(measurement['value']),
+                'location': measurement['location'],
+                'createdAt': int(measurement["createdAt"].strftime('%Y%m%d'))
+            })
     # create dataset
     df_measurements = pd.DataFrame(measurements)
     return df_measurements

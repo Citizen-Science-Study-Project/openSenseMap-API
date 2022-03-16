@@ -226,7 +226,7 @@ const descriptiveStatisticsHandler = async function descriptiveStatisticsHandler
     from: fromDate,
     to: toDate,
     // add sensorId, value and createdAt to query columns
-    columns: ['createdAt', 'sensorId', 'value', ...columns],
+    columns: ['createdAt', 'sensorId', 'value', 'id_outlier', ...columns],
     order: { sensor_id: 1, createdAt: 1 },
     transformations: { parseValues: true },
   };
